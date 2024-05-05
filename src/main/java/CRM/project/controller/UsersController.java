@@ -13,20 +13,22 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @Slf4j
 @RequestMapping("/user")
+@CrossOrigin
 public class UsersController {
     @Autowired
     private UsersService usersService;
 
     @PostMapping("/addUser")
-    public ResponseEntity<?> addUser(@RequestBody Users users)
+    public ResponseEntity<?> addUser(@RequestBody Map<String, String> data)
     {
-        Users user1=usersService.addNewUser(users);
+        Users user1=usersService.addNewUser(data);
         return (user1!=null) ? new ResponseEntity<>(new Responses("00", "User details Saved Successfully"), HttpStatus.OK)
-                : new ResponseEntity<>(new Responses("99", "Record not saved, Ensure staff name exists"), HttpStatus.OK);
+                : new ResponseEntity<>(new Responses("99", "Record not saved, Ensure staff name has not been created"), HttpStatus.OK);
     }
     @PostMapping("/findByStaff")
     public Users fetchByStaffName(@RequestBody Requestdto requestdto)

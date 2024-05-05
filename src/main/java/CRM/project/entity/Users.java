@@ -1,9 +1,7 @@
 package CRM.project.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import javax.persistence.*;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,6 +14,10 @@ public class Users {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long unitId;
-    private String unitName;
+
+    @ManyToOne
+    @JoinColumn(name = "department_id")
+    private Department unitName;
     private String staffName;
+    private String userEmail;
 }

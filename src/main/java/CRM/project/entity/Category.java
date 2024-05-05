@@ -1,10 +1,10 @@
 package CRM.project.entity;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.*;
 import java.util.List;
 
 @Data
@@ -16,6 +16,13 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long categoryId;
     private String categoryName;
-    @OneToMany
-    private List<SubCategory> subCategories;
+
+    @ManyToOne
+    @JoinColumn(name = "department_id")
+    private Department unitName;
+
+    @Transient
+    private String department;
+//    @OneToMany
+//    private List<SubCategory> subCategories;
 }

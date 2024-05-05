@@ -13,6 +13,7 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/save")
+@CrossOrigin
 public class RequestController {
     @Autowired
     private RequestService requestService;
