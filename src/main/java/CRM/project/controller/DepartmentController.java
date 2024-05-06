@@ -60,4 +60,10 @@ public class DepartmentController {
         return new ResponseEntity<>(allDepartments, HttpStatus.OK);
     }
 
+
+    @PostMapping("/allDepartments")
+    public ResponseEntity<?> findAllDepartments() {
+        List<Department> listAllDepartments = departmentService.getDepartments();
+        return new ResponseEntity<>(listAllDepartments, HttpStatus.OK);
+    }
 }

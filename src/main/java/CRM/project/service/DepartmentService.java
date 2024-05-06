@@ -8,4 +8,6 @@ public interface DepartmentService {
     Department addNewDepartment(Department department);
 
     List<Department> findAllDepartmentsByName(String departmentName);
+
+    List<Department> getDepartments();
 }
