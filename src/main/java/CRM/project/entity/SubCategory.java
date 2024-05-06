@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SubCategory {
+public class SubCategory extends TimeClass {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;

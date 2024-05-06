@@ -10,4 +10,6 @@ public interface DepartmentService {
     List<Department> findAllDepartmentsByName(String departmentName);
 
     List<Department> getDepartments();
+
+
 }

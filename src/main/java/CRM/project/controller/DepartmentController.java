@@ -54,8 +54,6 @@ public class DepartmentController {
     }
     @PostMapping("/findDepartmentsByDepartmentName")
     public ResponseEntity<?> findAllDepartmentsByName(@RequestBody Requestdto requestdto) {
-
-
         List<Department> allDepartments = departmentService.findAllDepartmentsByName(requestdto.getDepartmentName());
         return new ResponseEntity<>(allDepartments, HttpStatus.OK);
     }

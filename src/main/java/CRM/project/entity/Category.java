@@ -11,7 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-public class Category {
+public class Category extends TimeClass {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long categoryId;

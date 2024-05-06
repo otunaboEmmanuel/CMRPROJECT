@@ -26,5 +26,6 @@ public class RequestEntity {
     private String name;
     private String type;
     private String email;
+    private String status;
     private String filePath;
 }

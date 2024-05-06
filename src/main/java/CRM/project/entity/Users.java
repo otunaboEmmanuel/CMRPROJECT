@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Users {
+public class Users extends TimeClass {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long unitId;

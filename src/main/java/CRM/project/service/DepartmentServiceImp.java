@@ -31,4 +31,6 @@ public class DepartmentServiceImp implements DepartmentService {
     public List<Department> getDepartments() {
         return departmentRepository.findAll();
     }
+
+
 }

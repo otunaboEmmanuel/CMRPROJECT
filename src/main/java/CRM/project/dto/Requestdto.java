@@ -20,6 +20,7 @@ public class Requestdto {
     private Long departmentId;
     private String departmentName;
     private Users user;
+    private String status;
     private Long unitId;
     private String unitName;
     private String staffName;

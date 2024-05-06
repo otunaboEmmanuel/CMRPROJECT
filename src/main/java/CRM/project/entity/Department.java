@@ -9,17 +9,14 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Department {
+public class Department extends TimeClass {
    @Id
    @GeneratedValue(strategy = GenerationType.AUTO)
    private Long departmentId;
    private String departmentName;
-
 //    @OneToMany
 //    @JoinColumn(name = "users_id", referencedColumnName = "unitId")
-
     private String email;
-
     @Transient
     private String creationType;
 }
