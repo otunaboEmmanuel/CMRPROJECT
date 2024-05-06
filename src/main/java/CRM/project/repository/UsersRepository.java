@@ -12,5 +12,5 @@ public interface UsersRepository extends JpaRepository<Users,Long> {
 
     List<Users> findAllByUnitName(String unit);
 
-    List<Users> findByUnitName(String unit);
+    List<Users> findByUnitName(Department unit);
 }

@@ -4,13 +4,16 @@ import CRM.project.entity.Department;
 import CRM.project.entity.Users;
 import CRM.project.repository.DepartmentRepository;
 import CRM.project.repository.UsersRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
+@Slf4j
 public class UserserviceImp implements UsersService {
     @Autowired
     private UsersRepository usersRepository;
@@ -44,7 +47,12 @@ public class UserserviceImp implements UsersService {
 
     @Override
     public List<Users> fetchStaffByUnit(String unitName) {
-        return usersRepository.findByUnitName(unitName);
+        log.info(unitName);
+        Optional<Department> department = departmentRepository.findByDepartmentName(unitName);
+        if(department.isPresent()) {
+            return usersRepository.findByUnitName(department.get());
+        }
+        return null;
     }
 
 

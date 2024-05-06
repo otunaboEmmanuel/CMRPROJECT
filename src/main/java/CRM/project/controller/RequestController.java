@@ -12,18 +12,20 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/save")
+@RequestMapping("/requests")
 @CrossOrigin
 public class RequestController {
     @Autowired
     private RequestService requestService;
-    @PostMapping("/fileSystem")
-    public ResponseEntity<?> uploadImageToFIleSystem(@RequestParam("image") MultipartFile file,RequestEntity requestEntity,
-                                                     @RequestParam("subject") String subject,
+    @PostMapping("/createRequest")
+    public ResponseEntity<?> uploadImageToFIleSystem(@RequestParam("attachments") MultipartFile file,
+                                                     RequestEntity requestEntity,
+                                                     @RequestParam("title") String subject,
                                                      @RequestParam("unit") String unit,
+                                                     @RequestParam("email") String email,
                                                      @RequestParam("priority") String priority,
                                                      @RequestParam("category") String category,
-                                                     @RequestParam("subCategory") String subCategory,
+                                                     @RequestParam("subcategory") String subCategory,
                                                      @RequestParam("description") String description,
                                                      @RequestParam("technician") String technician) throws IOException {
         requestEntity.setSubject(subject);
@@ -33,6 +35,7 @@ public class RequestController {
         requestEntity.setSubCategory(subCategory);
         requestEntity.setDescription(description);
         requestEntity.setTechnician(technician);
+        requestEntity.setEmail(email);
         String uploadImage =requestService.uploadImageToFileSystem(file,requestEntity);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(uploadImage);
