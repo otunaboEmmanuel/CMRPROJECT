@@ -5,6 +5,7 @@ import CRM.project.entity.Department;
 import CRM.project.entity.SubCategory;
 import CRM.project.repository.DepartmentRepository;
 import CRM.project.repository.SubCategoryRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class SubCategoryImp implements SubCategoryService {
     @Autowired
     private SubCategoryRepository subCategoryRepository;
@@ -48,5 +50,12 @@ public class SubCategoryImp implements SubCategoryService {
         }
 
         return responseData;
+    }
+
+    @Override
+    public List<SubCategory> fetchAllSubcategories() {
+        List<SubCategory> all =  subCategoryRepository.findAll();
+        log.info(""+all.toString());
+        return all;
     }
 }

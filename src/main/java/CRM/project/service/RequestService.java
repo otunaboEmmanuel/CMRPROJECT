@@ -2,7 +2,12 @@ package CRM.project.service;
 
 import CRM.project.dto.Requestdto;
 import CRM.project.entity.RequestEntity;
+import CRM.project.entity.Status;
+import CRM.project.entity.SubCategory;
+import CRM.project.entity.Users;
 import CRM.project.repository.RequestRepository;
+import CRM.project.repository.SubCategoryRepository;
+import CRM.project.repository.UsersRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,6 +18,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -22,22 +28,42 @@ public class RequestService {
     static String DIRECTORY_PATH = "/u01/uploads/";
     @Autowired
     private RequestRepository requestRepository;
-    public Map<String, String> uploadImageToFileSystem(MultipartFile file, RequestEntity requestEntity) throws IOException {
 
-        String filePath = saveFileToStorage(file);
-        requestEntity.setName(file.getOriginalFilename());
-        requestEntity.setType(file.getContentType());
-        requestEntity.setFilePath(DIRECTORY_PATH+filePath);
-        RequestEntity storeData=requestRepository.save(requestEntity);
+    @Autowired
+    private UsersRepository usersRepository;
+
+    @Autowired
+    private SubCategoryRepository subCategoryRepository;
+    public Map<String, String> uploadImageToFileSystem(MultipartFile file, RequestEntity requestEntity) throws IOException {
         Map<String, String> responseData = new HashMap<>();
-        if(storeData != null) {
-            responseData.put("code", "00");
-            responseData.put("message", "Request saved successfully");
+        SubCategory sub = subCategoryRepository.findBySubCategoryName(requestEntity.getSubCategory()).orElse(null);
+        if(sub != null) {
+            requestEntity.setSla(sub.getSla());
+            requestEntity.setDueDate(LocalDateTime.now().plusHours((long) sub.getSla()));
+
+            if (file != null) {
+                String filePath = saveFileToStorage(file);
+                requestEntity.setFilePath(DIRECTORY_PATH + filePath);
+                requestEntity.setType(file.getContentType());
+                requestEntity.setName(file.getOriginalFilename());
+            }
+
+            requestEntity.setStatus(Status.OPEN);
+            RequestEntity storeData = requestRepository.save(requestEntity);
+
+            if (storeData != null) {
+                responseData.put("code", "00");
+                responseData.put("message", "Request saved successfully");
+                responseData.put("requestId", String.valueOf(storeData.getId()));
+            } else {
+                responseData.put("code", "90");
+                responseData.put("message", "Failed to save request");
+            }
         }
 
         else {
-            responseData.put("code", "90");
-            responseData.put("message", "Failed to save request");
+            responseData.put("code", "99");
+            responseData.put("message", "Invalid Sub-Category");
         }
         return responseData;
     }
@@ -53,11 +79,18 @@ public class RequestService {
     private String saveFileToStorage(MultipartFile file) {
 
         String extensionType = file.getContentType();
-        String fileName = UUID.randomUUID().toString().replace("-", "") + extensionType;
+
+        String extension = "";
+
+        if (extensionType != null && !extensionType.isEmpty()) {
+            String[] parts = extensionType.split("/");
+            if (parts.length > 1) {
+                extension = "." + parts[1];
+            }
+        }
+        String fileName = UUID.randomUUID().toString().replace("-", "") + extension;
 
         try {
-
-
             File directory = new File(DIRECTORY_PATH);
             if (!directory.exists()) {
                 directory.mkdirs();
@@ -77,5 +110,38 @@ public class RequestService {
 
     public List<RequestEntity> findAllRequestsByUnit(String unit) {
         return requestRepository.findByUnit(unit);
+    }
+
+    public Map<String, Integer> findAllRecordByUser(String userName) {
+        log.info("User is "+userName);
+        Users user = usersRepository.findByUserEmail(userName).orElse(null);
+        Map<String, Integer> result = new HashMap<>();
+        if(user != null) {
+            List<RequestEntity> allRequests = requestRepository.findByTechnician(user.getStaffName());
+
+            int totalRequests = allRequests.size();
+            log.info(""+totalRequests);
+
+            int sumOfClosedRequests = allRequests.stream()
+                    .filter(request -> Status.CLOSED.equals(request.getStatus()))
+                    .mapToInt(request -> 1)
+                    .sum();
+
+            int  sumOfOpenRequests = allRequests.stream()
+                    .filter(request -> Status.OPEN.equals(request.getStatus()))
+                    .mapToInt(request -> 1)
+                    .sum();
+
+            int sumOfRequestsWithinSla = allRequests.stream()
+                    .filter(request -> LocalDateTime.now().isAfter(request.getDueDate()))
+                    .mapToInt(request -> 1)
+                    .sum();
+            result.put("openRequest", sumOfOpenRequests);
+            result.put("closedRequest", sumOfClosedRequests);
+            result.put("totalRequest", totalRequests);
+            result.put("withinSla", sumOfRequestsWithinSla);
+            result.put("breachedSla", totalRequests - sumOfRequestsWithinSla);
+        }
+        return result;
     }
 }

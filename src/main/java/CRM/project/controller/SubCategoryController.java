@@ -49,4 +49,9 @@ public class SubCategoryController {
         } else
             return null;
     }
+
+    @PostMapping("/getAllSubCategories")
+    public ResponseEntity<?> getAllSubCategories() {
+        return new ResponseEntity<>(subCategoryService.fetchAllSubcategories(), HttpStatus.OK);
+    }
 }

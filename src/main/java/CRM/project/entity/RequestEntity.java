@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -12,20 +15,27 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class RequestEntity {
+@EntityListeners(AuditingEntityListener.class)
+public class RequestEntity extends TimeClass {
    @Id
    @GeneratedValue(strategy = GenerationType.AUTO)
-   private Integer Id;
+   private Integer id;
     private String unit;
     private String subject;
     private String priority;
     private String category;
     private String subCategory;
     private String description;
-    private String Technician;
+    private String technician;
     private String name;
     private String type;
     private String email;
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private Status status;
     private String filePath;
+    private LocalDateTime dueDate;
+    private int sla;
+    private String requester;
+    private String closureComments;
+    private LocalDateTime closureTime;
 }

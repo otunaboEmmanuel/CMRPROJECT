@@ -1,6 +1,7 @@
 package CRM.project.service;
 
 import CRM.project.entity.Department;
+import CRM.project.entity.RequestEntity;
 import CRM.project.entity.Users;
 import CRM.project.repository.DepartmentRepository;
 import CRM.project.repository.UsersRepository;
@@ -18,12 +19,13 @@ public class UserserviceImp implements UsersService {
     @Autowired
     private UsersRepository usersRepository;
 
+
     @Autowired
     private DepartmentRepository departmentRepository;
     @Override
     public Users addNewUser(Map<String,String> data) {
         Users users1=usersRepository.findByStaffName(data.get("technician")).orElse(null);
-        Department department1=departmentRepository.findByDepartmentName(data.get("unit")).orElse(null);
+        Department department1=departmentRepository.findByDepartmentName(data.get("unit").split("~~")[0]).orElse(null);
 
         if(department1 != null && users1 == null) {
             Users users = new Users();
@@ -37,7 +39,7 @@ public class UserserviceImp implements UsersService {
 
     @Override
     public Users fetchStaffByName(String staffName) {
-        return usersRepository.findByStaffName(staffName).orElse(null);
+        return usersRepository.findByUserEmail(staffName).orElse(null);
     }
 
     @Override
@@ -47,12 +49,17 @@ public class UserserviceImp implements UsersService {
 
     @Override
     public List<Users> fetchStaffByUnit(String unitName) {
-        log.info(unitName);
+
         Optional<Department> department = departmentRepository.findByDepartmentName(unitName);
         if(department.isPresent()) {
             return usersRepository.findByUnitName(department.get());
         }
         return null;
+    }
+
+    @Override
+    public List<Users> findAllUsers() {
+        return usersRepository.findAll();
     }
 
 

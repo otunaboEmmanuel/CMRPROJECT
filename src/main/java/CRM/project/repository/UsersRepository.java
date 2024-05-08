@@ -13,4 +13,6 @@ public interface UsersRepository extends JpaRepository<Users,Long> {
     List<Users> findAllByUnitName(String unit);
 
     List<Users> findByUnitName(Department unit);
+
+    Optional<Users> findByUserEmail(String s);
 }

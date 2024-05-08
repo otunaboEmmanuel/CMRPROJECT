@@ -7,4 +7,6 @@ import java.util.List;
 public interface CategoryService {
     Category addNewCategory(Category category);
     List<Category> getAllCategory(Category category);
+
+    List<Category> fetchCategories();
 }

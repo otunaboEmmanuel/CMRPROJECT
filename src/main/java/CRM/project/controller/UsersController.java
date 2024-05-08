@@ -2,6 +2,7 @@ package CRM.project.controller;
 
 import CRM.project.dto.Requestdto;
 import CRM.project.entity.Department;
+import CRM.project.entity.RequestEntity;
 import CRM.project.entity.Users;
 import CRM.project.response.Responses;
 import CRM.project.service.DepartmentService;
@@ -45,6 +46,12 @@ public class UsersController {
     {
         List<Users> unit=usersService.fetchStaffByUnit(requestdto.getUnitName());
         return new ResponseEntity<>(unit, HttpStatus.OK);
+    }
+
+
+    @PostMapping("/fetchUsers")
+    public ResponseEntity<?> findAllUsers() {
+        return new ResponseEntity<>(usersService.findAllUsers(), HttpStatus.OK);
     }
 
 }

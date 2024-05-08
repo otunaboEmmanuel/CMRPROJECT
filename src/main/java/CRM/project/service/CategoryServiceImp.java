@@ -21,6 +21,7 @@ public class CategoryServiceImp implements CategoryService {
         Department department1=departmentRepository.findByDepartmentName(category.getDepartment()).orElse(null);
 
         if(department1 != null) {
+            category.setUnitName(department1);
             Category category1 = categoryRepository.findByCategoryName(category.getCategoryName()).orElse(null);
             return category1 == null ? categoryRepository.save(category) : null;
         }
@@ -31,5 +32,10 @@ public class CategoryServiceImp implements CategoryService {
     public List<Category> getAllCategory(Category category) {
         Department department1=departmentRepository.findByDepartmentName(category.getDepartment()).orElse(null);
         return department1!=null? categoryRepository.findByUnitName(department1): null;
+    }
+
+    @Override
+    public List<Category> fetchCategories() {
+        return categoryRepository.findAll();
     }
 }

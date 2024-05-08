@@ -1,6 +1,7 @@
 package CRM.project.service;
 
 import CRM.project.entity.Department;
+import CRM.project.entity.RequestEntity;
 import CRM.project.entity.Users;
 
 import java.util.List;
@@ -17,4 +18,5 @@ public interface UsersService {
     List<Users> fetchStaffByUnit(String unit);
 
 
+    List<Users> findAllUsers();
 }
