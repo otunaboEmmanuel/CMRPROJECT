@@ -70,9 +70,7 @@ public class RequestService {
 
 
     public byte[] downloadImageFromFileSystem(String fileName) throws IOException {
-        Optional<RequestEntity> fileData = requestRepository.findByName(fileName);
-        String filePath=fileData.get().getFilePath();
-        byte[] images = Files.readAllBytes(new File(filePath).toPath());
+        byte[] images = Files.readAllBytes(new File(fileName).toPath());
         return images;
     }
 

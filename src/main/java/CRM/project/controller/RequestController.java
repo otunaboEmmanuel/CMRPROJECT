@@ -58,11 +58,11 @@ public class RequestController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(uploadImage);
     }
-    @GetMapping("/projectFile/{fileName}")
-    public ResponseEntity<?> downloadImageFromFileSystem(@PathVariable String fileName) throws IOException {
-        byte[] imageData=requestService.downloadImageFromFileSystem(fileName);
+    @PostMapping("/downloadRequest")
+    public ResponseEntity<?> downloadImageFromFileSystem(@RequestBody Map<String, String> data) throws IOException {
+        RequestEntity requestdto1=requestRepository.findById(Integer.valueOf(data.get("requestId"))).orElse(null);
+        byte[] imageData=requestService.downloadImageFromFileSystem(requestdto1.getFilePath());
         return ResponseEntity.status(HttpStatus.OK)
-                .contentType(MediaType.valueOf("image/png"))
                 .body(imageData);
 
     }

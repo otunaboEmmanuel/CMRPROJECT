@@ -4,11 +4,13 @@ import CRM.project.entity.Category;
 import CRM.project.entity.Department;
 import CRM.project.response.Responses;
 import CRM.project.service.CategoryService;
+import CRM.project.utils.ExcelToCategoryutils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -19,6 +21,8 @@ import java.util.List;
 public class CategoryController {
     @Autowired
     private CategoryService categoryService;
+    @Autowired
+    private ExcelToCategoryutils utils;
     @PostMapping("/addCategory")
     public ResponseEntity<?> addNewCategory(@RequestBody Category category)
     {
@@ -39,6 +43,12 @@ public class CategoryController {
 
         List<Category> categories=categoryService.fetchCategories();
         return ResponseEntity.ok(categories);
+    }
+
+    //added the poiji dependency needed
+    @PostMapping("/bulkUpload")
+    public List<Category> upload(@RequestParam("file")MultipartFile file){
+        return utils.convertFromExcel(file);
     }
 
 }
