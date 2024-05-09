@@ -26,4 +26,5 @@ public class Requestdto {
     private String staffName;
     private long categoryId;
     private String categoryName;
+    private String userEmail;
 }

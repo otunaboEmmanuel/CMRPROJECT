@@ -2,11 +2,9 @@ package CRM.project.controller;
 
 import CRM.project.dto.Requestdto;
 import CRM.project.entity.Category;
-import CRM.project.entity.Department;
 import CRM.project.entity.SubCategory;
 import CRM.project.entity.Users;
 import CRM.project.repository.CategoryRepository;
-import CRM.project.response.Responses;
 import CRM.project.service.SubCategoryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -19,6 +19,7 @@ import java.util.List;
 public class CategoryController {
     @Autowired
     private CategoryService categoryService;
+
     @PostMapping("/addCategory")
     public ResponseEntity<?> addNewCategory(@RequestBody Category category)
     {

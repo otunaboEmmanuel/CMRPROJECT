@@ -11,11 +11,13 @@ import java.util.List;
 
 @Service
 public class CategoryServiceImp implements CategoryService {
+
     @Autowired
     private CategoryRepository categoryRepository;
 
     @Autowired
     private DepartmentRepository departmentRepository;
+
     @Override
     public Category addNewCategory(Category category) {
         Department department1=departmentRepository.findByDepartmentName(category.getDepartment()).orElse(null);

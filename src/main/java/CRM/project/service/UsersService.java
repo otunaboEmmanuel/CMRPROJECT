@@ -1,6 +1,5 @@
 package CRM.project.service;
 
-import CRM.project.entity.Department;
 import CRM.project.entity.Users;
 
 import java.util.List;
