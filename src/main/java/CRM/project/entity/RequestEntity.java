@@ -21,6 +21,7 @@ public class RequestEntity extends TimeClass {
    @GeneratedValue(strategy = GenerationType.AUTO)
    private Integer id;
     private String unit;
+    private LocalDateTime logTime;
     private String subject;
     private String priority;
     private String category;
@@ -36,6 +37,8 @@ public class RequestEntity extends TimeClass {
     private LocalDateTime dueDate;
     private int sla;
     private String requester;
+    private String requesterUnit;
     private String closureComments;
     private LocalDateTime closureTime;
+    private int rating;
 }

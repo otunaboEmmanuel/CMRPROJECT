@@ -1,5 +1,6 @@
 package CRM.project.service;
 
+import CRM.project.dto.Roles;
 import CRM.project.entity.Department;
 import CRM.project.entity.RequestEntity;
 import CRM.project.entity.Users;
@@ -32,6 +33,7 @@ public class UserserviceImp implements UsersService {
             users.setStaffName(data.get("technician"));
             users.setUnitName(department1);
             users.setUserEmail(data.get("email"));
+            users.setRoles(Roles.fromCode(data.get("role")));
             return usersRepository.save(users);
         }
         return null;

@@ -2,6 +2,7 @@ package CRM.project.entity;
 
 import javax.persistence.*;
 
+import CRM.project.dto.Roles;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,4 +23,7 @@ public class Users extends TimeClass {
     private Department unitName;
     private String staffName;
     private String userEmail;
+
+    @Enumerated(EnumType.STRING)
+    private Roles roles;
 }

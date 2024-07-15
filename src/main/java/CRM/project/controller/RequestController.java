@@ -5,8 +5,10 @@ import CRM.project.dto.Requestdto;
 import CRM.project.entity.Department;
 import CRM.project.entity.RequestEntity;
 import CRM.project.entity.Status;
+import CRM.project.entity.Users;
 import CRM.project.repository.DepartmentRepository;
 import CRM.project.repository.RequestRepository;
+import CRM.project.repository.UsersRepository;
 import CRM.project.response.Responses;
 import CRM.project.service.RequestService;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +36,9 @@ public class RequestController {
     private RequestRepository requestRepository;
     @Autowired
     private DepartmentRepository departmentRepository;
+
+    @Autowired
+    private UsersRepository usersRepository;
     @PostMapping("/createRequest")
     public ResponseEntity<?> uploadImageToFIleSystem(@RequestParam(value = "attachments", required = false) MultipartFile file,
                                                      @RequestParam("requester") String requester,
@@ -54,6 +59,7 @@ public class RequestController {
         requestEntity.setDescription(description);
         requestEntity.setTechnician(technician);
         requestEntity.setEmail(email);
+        log.info("Requester name is:: "+requestEntity.getRequester());
         Map<String, String> uploadImage =requestService.uploadImageToFileSystem(file,requestEntity);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(uploadImage);
@@ -71,9 +77,33 @@ public class RequestController {
 
         Optional<Department> department = departmentRepository.findByDepartmentName(requestdto.getDepartmentName());
         if(department.isPresent()) {
-            List<RequestEntity> requests = requestRepository.findByStatusAndUnit(Status.valueOf(requestdto.getStatus()), department.get().getDepartmentName());
+            List<RequestEntity> requests = requestRepository.findByStatusAndUnitAndTechnician(Status.valueOf(requestdto.getStatus()), department.get().getDepartmentName(), requestdto.getTechnician());
             return new ResponseEntity<>(requests, HttpStatus.OK);
         } else return new ResponseEntity<>(new Responses("90","Request could not be found"),HttpStatus.OK);
+    }
+
+
+    @PostMapping("/findRequestByRequester")
+    public ResponseEntity<?> findRequestByRequester(@RequestBody Requestdto requestdto) {
+
+        log.info("Incoming request::: "+requestdto.toString());
+//        Users user = usersRepository.findByStaffName(requestdto.getStaffName()).orElse(null);
+//        if(user!=null) {
+            List<RequestEntity> requests = null;
+            if(requestdto.getStatus() == null) {
+               requests = requestRepository.findByRequester(requestdto.getStaffName());
+            }
+            else {
+                if(requestdto.getStaffName() != null) {
+                    requests = requestRepository.findByRequesterAndStatus(requestdto.getStaffName(), Status.valueOf(requestdto.getStatus()));
+                }
+                else {
+                    requests = requestRepository.findByRequesterUnitAndStatus(requestdto.getDepartmentName(), Status.valueOf(requestdto.getStatus()));
+                }
+            }
+            return new ResponseEntity<>(requests, HttpStatus.OK);
+//        } else
+//            return new ResponseEntity<>(new Responses("90","Request could not be found"),HttpStatus.OK);
     }
 
 
@@ -109,6 +139,7 @@ public class RequestController {
             request.setStatus(Status.valueOf(data.get("status")));
             request.setClosureComments(data.get("closureComments"));
             request.setClosureTime(LocalDateTime.now());
+            request.setRating(Integer.parseInt(data.get("rating")));
             requestRepository.save(request);
             response.put("code", "00");
         }
@@ -150,25 +181,42 @@ public class RequestController {
 
 
         log.info("Incoming request for bulk assigning "+bulkDto.toString());
-        Map<String, String> response = new HashMap<>();
-        for(RequestEntity request : bulkDto.getRequests()) {
-            RequestEntity findRequest = requestRepository.findById((request.getId())).orElse(null);
+        if(bulkDto.getTechnician() != null) {
+            Map<String, String> response = new HashMap<>();
+            for (RequestEntity request : bulkDto.getRequests()) {
+                RequestEntity findRequest = requestRepository.findById((request.getId())).orElse(null);
 
-            if(request != null) {
-                request.setTechnician(bulkDto.getTechnician());
-                request.setStatus(Status.CLOSED);
-                request.setClosureTime(LocalDateTime.now());
-                request.setClosureComments("Closed Automatically");
-                requestRepository.save(request);
-                response.put("code", "00");
+                if (findRequest != null) {
+                    findRequest.setTechnician(bulkDto.getTechnician());
+                    findRequest.setStatus(Status.RESOLVED);
+                    findRequest.setClosureTime(LocalDateTime.now());
+                    findRequest.setClosureComments("Marked as resolved and awaiting confirmation");
+                    requestRepository.save(findRequest);
+                    response.put("code", "00");
+                } else {
+                    response.put("code", "99");
+                }
             }
-
-            else {
-                response.put("code", "99");
-            }
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
+        else {
+            Map<String, String> response = new HashMap<>();
+            for (RequestEntity request : bulkDto.getRequests()) {
+                RequestEntity findRequest = requestRepository.findById((request.getId())).orElse(null);
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+                if (findRequest != null) {
+                    findRequest.setStatus(Status.CLOSED);
+                    findRequest.setClosureTime(LocalDateTime.now());
+                    findRequest.setClosureComments("Marked as Closed");
+                    requestRepository.save(findRequest);
+                    response.put("code", "00");
+                } else {
+                    response.put("code", "99");
+                }
+            }
+            return new ResponseEntity<>(response, HttpStatus.OK);
+
+        }
 
     }
 

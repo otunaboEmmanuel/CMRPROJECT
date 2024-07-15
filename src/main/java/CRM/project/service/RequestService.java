@@ -18,8 +18,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -48,7 +51,18 @@ public class RequestService {
                 requestEntity.setName(file.getOriginalFilename());
             }
 
+            if(requestEntity.getTechnician().equalsIgnoreCase("Unassigned")) {
+                String technician = findLeastAssignedTechnician(requestEntity.getUnit());
+                if(technician != null) {
+                    requestEntity.setTechnician(technician);
+                }
+                else {
+                    requestEntity.setTechnician("Unassigned");
+                }
+            }
             requestEntity.setStatus(Status.OPEN);
+            requestEntity.setLogTime(LocalDateTime.now());
+            log.info("Request Entity:::::: "+requestEntity);
             RequestEntity storeData = requestRepository.save(requestEntity);
 
             if (storeData != null) {
@@ -72,6 +86,35 @@ public class RequestService {
     public byte[] downloadImageFromFileSystem(String fileName) throws IOException {
         byte[] images = Files.readAllBytes(new File(fileName).toPath());
         return images;
+    }
+
+    private String findLeastAssignedTechnician(String unitName) {
+
+        List<RequestEntity> allRequestsForTheDay = requestRepository.findByCreatedTimeBetween(LocalDate.now().atStartOfDay(), LocalDate.now().atTime(LocalTime.MAX));
+
+        Map<String, Long> technicianRequestCount = allRequestsForTheDay.stream()
+                .collect(Collectors.groupingBy(RequestEntity::getTechnician, Collectors.counting()));
+
+        log.info(technicianRequestCount.toString());
+
+        long minRequestCount = technicianRequestCount.values().stream().min(Long::compare).orElse(Long.MAX_VALUE);
+
+        log.info(""+minRequestCount);
+        // Collect technicians with the minimum number of requests
+        List<String> leastBusyTechnicians = technicianRequestCount.entrySet().stream()
+                .filter(entry -> entry.getValue() == minRequestCount)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+
+        log.info(leastBusyTechnicians.toString());
+
+        if (!leastBusyTechnicians.isEmpty()) {
+            Random random = new Random();
+            return leastBusyTechnicians.get(random.nextInt(leastBusyTechnicians.size()));
+        }
+
+        return null;
+
     }
 
     private String saveFileToStorage(MultipartFile file) {
@@ -125,6 +168,11 @@ public class RequestService {
                     .mapToInt(request -> 1)
                     .sum();
 
+            int sumOfResolvedRequests = allRequests.stream()
+                    .filter(request -> Status.RESOLVED.equals(request.getStatus()))
+                    .mapToInt(request -> 1)
+                    .sum();
+
             int  sumOfOpenRequests = allRequests.stream()
                     .filter(request -> Status.OPEN.equals(request.getStatus()))
                     .mapToInt(request -> 1)
@@ -137,6 +185,7 @@ public class RequestService {
             result.put("openRequest", sumOfOpenRequests);
             result.put("closedRequest", sumOfClosedRequests);
             result.put("totalRequest", totalRequests);
+            result.put("resolvedTicket", sumOfResolvedRequests);
             result.put("withinSla", sumOfRequestsWithinSla);
             result.put("breachedSla", totalRequests - sumOfRequestsWithinSla);
         }

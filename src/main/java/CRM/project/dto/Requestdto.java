@@ -16,7 +16,7 @@ public class Requestdto {
     private String category;
     private String subCategory;
     private String description;
-    private String Technician;
+    private String technician;
     private Long departmentId;
     private String departmentName;
     private Users user;

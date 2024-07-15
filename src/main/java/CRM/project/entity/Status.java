@@ -1,5 +1,5 @@
 package CRM.project.entity;
 
 public enum Status {
-    OPEN,CLOSED;
+    OPEN,RESOLVED,CLOSED;
 }
