@@ -28,8 +28,8 @@ public class UsersController {
     public ResponseEntity<?> addUser(@RequestBody Map<String, String> data)
     {
         Users user1=usersService.addNewUser(data);
-        return (user1!=null) ? new ResponseEntity<>(new Responses("00", "User details Saved Successfully"), HttpStatus.OK)
-                : new ResponseEntity<>(new Responses("99", "Record not saved, Ensure staff name has not been created"), HttpStatus.OK);
+        return (user1!=null) ? new ResponseEntity<>(new Responses("00", "User details Saved Successfully", null), HttpStatus.OK)
+                : new ResponseEntity<>(new Responses("99", "Record not saved, Ensure staff name has not been created", null), HttpStatus.OK);
     }
     @PostMapping("/findByStaff")
     public Users fetchByStaffName(@RequestBody Requestdto requestdto)
@@ -54,4 +54,10 @@ public class UsersController {
         return new ResponseEntity<>(usersService.findAllUsers(), HttpStatus.OK);
     }
 
+
+    @PostMapping("/modify-availability")
+    public ResponseEntity<?> modifyUserAvailability(@RequestBody Map<String, String> data) {
+        log.info("Modifying user with id "+data.get("userId"));
+        return new ResponseEntity<>(usersService.updateAvailability(data), HttpStatus.OK);
+    }
 }

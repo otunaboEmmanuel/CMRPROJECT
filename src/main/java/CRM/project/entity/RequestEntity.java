@@ -1,13 +1,18 @@
 package CRM.project.entity;
 
 import javax.persistence.*;
+
+import CRM.project.dto.CommentData;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Cascade;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 @Entity
 @Data
@@ -38,6 +43,22 @@ public class RequestEntity extends TimeClass {
     private int sla;
     private String requester;
     private String requesterUnit;
+
+//    @ElementCollection
+//    @CollectionTable(
+//            name = "comment_map",
+//            joinColumns = @JoinColumn(name = "id", referencedColumnName = "id")
+//    )
+//    @MapKeyColumn(name = "comment_key")
+//    @Column(name = "comment_value")
+//    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+//    private Map<String, String> comments;
+
+    @ElementCollection
+    @Column(name = "comment_data")
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    private List<CommentData> commentData;
+
     private String closureComments;
     private LocalDateTime closureTime;
     private int rating;

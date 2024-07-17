@@ -34,8 +34,8 @@ public class DepartmentController {
     {
         log.info("Incoming request::::: "+department);
         Department department1=departmentService.addNewDepartment(department);
-        return department1!=null? new ResponseEntity<>(new Responses("00", "department details Saved Successfully"), HttpStatus.OK)
-                : new ResponseEntity<>(new Responses("99", "Record not saved, Ensure department name does not exist"), HttpStatus.OK);
+        return department1!=null? new ResponseEntity<>(new Responses("00", "department details Saved Successfully", null), HttpStatus.OK)
+                : new ResponseEntity<>(new Responses("99", "Record not saved, Ensure department name does not exist", null), HttpStatus.OK);
     }
 
     @PostMapping("/addUserToDepartment")
@@ -48,9 +48,9 @@ public class DepartmentController {
             department1.setDepartmentName(department.getDepartmentName());
             departmentRepository.save(department1);
             return new ResponseEntity<>(new Responses("00",
-                    "department details Saved Successfully"), HttpStatus.OK);
+                    "department details Saved Successfully", null), HttpStatus.OK);
         }else
-            return new ResponseEntity<>(new Responses("99", "Record not saved, Ensure UserId exits"), HttpStatus.OK);
+            return new ResponseEntity<>(new Responses("99", "Record not saved, Ensure UserId exits", null), HttpStatus.OK);
     }
     @PostMapping("/findDepartmentsByDepartmentName")
     public ResponseEntity<?> findAllDepartmentsByName(@RequestBody Requestdto requestdto) {

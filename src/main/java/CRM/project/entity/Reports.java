@@ -2,6 +2,8 @@ package CRM.project.entity;
 
 import CRM.project.dto.ReportData;
 import CRM.project.utils.ReportDataConverter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,7 +16,7 @@ import java.util.List;
 
 
 @Entity
-@Table(name = "user_reports")
+@Table(name = "user_reports", uniqueConstraints = @UniqueConstraint(columnNames = {"report_name", "created_by"}))
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -38,13 +40,15 @@ public class Reports {
 
     private LocalDateTime createdTime;
 
-//    @Cascade(org.hibernate.annotations.CascadeType.ALL)
-//    @ElementCollection
-//    @Column(name = "required_data")
     @Transient
     private List<String> requiredData;
 
     @Convert(converter = ReportDataConverter.class)
     @Column(name = "report_data", columnDefinition = "TEXT")
     private ReportData reportData;
+
+    @Column(name = "report_query")
+    @JsonIgnore
+    private String reportQuery;
 }
+

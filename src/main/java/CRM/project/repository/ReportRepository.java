@@ -11,4 +11,6 @@ import java.util.Optional;
 @Repository
 public interface ReportRepository extends JpaRepository<Reports, Long> {
     List<Reports> findByCreatedBy(String createdBy);
+
+    Optional<Reports> findByReportId(Long reportId);
 }

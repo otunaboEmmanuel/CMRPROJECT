@@ -1,6 +1,7 @@
 package CRM.project.controller;
 
 import CRM.project.dto.BulkDto;
+import CRM.project.dto.CommentData;
 import CRM.project.dto.Requestdto;
 import CRM.project.entity.Department;
 import CRM.project.entity.RequestEntity;
@@ -79,7 +80,7 @@ public class RequestController {
         if(department.isPresent()) {
             List<RequestEntity> requests = requestRepository.findByStatusAndUnitAndTechnician(Status.valueOf(requestdto.getStatus()), department.get().getDepartmentName(), requestdto.getTechnician());
             return new ResponseEntity<>(requests, HttpStatus.OK);
-        } else return new ResponseEntity<>(new Responses("90","Request could not be found"),HttpStatus.OK);
+        } else return new ResponseEntity<>(new Responses("90","Request could not be found", null),HttpStatus.OK);
     }
 
 
@@ -138,6 +139,8 @@ public class RequestController {
         if(request != null) {
             request.setStatus(Status.valueOf(data.get("status")));
             request.setClosureComments(data.get("closureComments"));
+            request.getCommentData().add(new CommentData(data.get("closedBy"), data.get("closureComments"), LocalDateTime.now()));
+//            request.getComments().add(data.get("closureComments"));
             request.setClosureTime(LocalDateTime.now());
             request.setRating(Integer.parseInt(data.get("rating")));
             requestRepository.save(request);
@@ -191,6 +194,7 @@ public class RequestController {
                     findRequest.setStatus(Status.RESOLVED);
                     findRequest.setClosureTime(LocalDateTime.now());
                     findRequest.setClosureComments("Marked as resolved and awaiting confirmation");
+                    findRequest.getCommentData().add(new CommentData(bulkDto.getTechnician(), "Marked as resolved and awaiting confirmation", LocalDateTime.now()));
                     requestRepository.save(findRequest);
                     response.put("code", "00");
                 } else {
@@ -207,6 +211,8 @@ public class RequestController {
                 if (findRequest != null) {
                     findRequest.setStatus(Status.CLOSED);
                     findRequest.setClosureTime(LocalDateTime.now());
+                    findRequest.getCommentData().add(new CommentData(bulkDto.getTechnician(), "Marked as Closed", LocalDateTime.now()));
+//                    findRequest.getComments().add("Marked as Closed");
                     findRequest.setClosureComments("Marked as Closed");
                     requestRepository.save(findRequest);
                     response.put("code", "00");

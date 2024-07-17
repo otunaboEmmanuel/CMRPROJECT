@@ -28,8 +28,8 @@ public class CategoryController {
     {
         log.info("Incoming request is::: "+category.toString());
         Category category1=categoryService.addNewCategory(category);
-        return category1!=null? new ResponseEntity<>(new Responses("00", "category details Saved Successfully"), HttpStatus.OK)
-                : new ResponseEntity<>(new Responses("99", "Record not saved, Ensure category name does not exist"), HttpStatus.OK);
+        return category1!=null? new ResponseEntity<>(new Responses("00", "category details Saved Successfully", null), HttpStatus.OK)
+                : new ResponseEntity<>(new Responses("99", "Record not saved, Ensure category name does not exist", null), HttpStatus.OK);
     }
     @PostMapping("/allCategory")
     public ResponseEntity<?> getAllCategoryByDepartment(@RequestBody Category category){
