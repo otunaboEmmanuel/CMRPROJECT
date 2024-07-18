@@ -1,10 +1,8 @@
 package CRM.project.service;
 
 import CRM.project.dto.Requestdto;
-import CRM.project.entity.RequestEntity;
-import CRM.project.entity.Status;
-import CRM.project.entity.SubCategory;
-import CRM.project.entity.Users;
+import CRM.project.entity.*;
+import CRM.project.repository.DepartmentRepository;
 import CRM.project.repository.RequestRepository;
 import CRM.project.repository.SubCategoryRepository;
 import CRM.project.repository.UsersRepository;
@@ -34,6 +32,9 @@ public class RequestService {
 
     @Autowired
     private UsersRepository usersRepository;
+
+    @Autowired
+    private DepartmentRepository departmentRepository;
 
     @Autowired
     private SubCategoryRepository subCategoryRepository;
@@ -90,27 +91,48 @@ public class RequestService {
 
     private String findLeastAssignedTechnician(String unitName) {
 
-        List<RequestEntity> allRequestsForTheDay = requestRepository.findByCreatedTimeBetween(LocalDate.now().atStartOfDay(), LocalDate.now().atTime(LocalTime.MAX));
+        Department department = departmentRepository.findByDepartmentName(unitName).orElse(null);
+        List<RequestEntity> allRequestsForTheDay = requestRepository.findByUnitAndCreatedTimeBetween(unitName, LocalDate.now().atStartOfDay(), LocalDate.now().atTime(LocalTime.MAX));
 
-        Map<String, Long> technicianRequestCount = allRequestsForTheDay.stream()
-                .collect(Collectors.groupingBy(RequestEntity::getTechnician, Collectors.counting()));
+        List<Users> allTeamMembers = usersRepository.findAllByUnitName(department);
+        List<String> unassignedStaff = new ArrayList<>();
 
-        log.info(technicianRequestCount.toString());
+        if(!allRequestsForTheDay.isEmpty()) {
+            Map<String, Long> technicianRequestCount = allRequestsForTheDay.stream()
+                    .collect(Collectors.groupingBy(RequestEntity::getTechnician, Collectors.counting()));
 
-        long minRequestCount = technicianRequestCount.values().stream().min(Long::compare).orElse(Long.MAX_VALUE);
+            log.info(technicianRequestCount.toString());
 
-        log.info(""+minRequestCount);
-        // Collect technicians with the minimum number of requests
-        List<String> leastBusyTechnicians = technicianRequestCount.entrySet().stream()
-                .filter(entry -> entry.getValue() == minRequestCount)
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
+            allTeamMembers.stream().forEach(users -> {
+                if (!technicianRequestCount.containsKey(users.getStaffName())) {
+                    unassignedStaff.add(users.getStaffName());
+                    log.info("Unassigned user is " + users.getStaffName());
+                }
+            });
 
-        log.info(leastBusyTechnicians.toString());
+            if (!unassignedStaff.isEmpty()) {
+                return unassignedStaff.get(0);
+            } else {
+                long minRequestCount = technicianRequestCount.values().stream().min(Long::compare).orElse(Long.MAX_VALUE);
+                log.info("" + minRequestCount);
 
-        if (!leastBusyTechnicians.isEmpty()) {
-            Random random = new Random();
-            return leastBusyTechnicians.get(random.nextInt(leastBusyTechnicians.size()));
+                List<String> leastBusyTechnicians = technicianRequestCount.entrySet().stream()
+                        .filter(entry -> entry.getValue() == minRequestCount)
+                        .map(Map.Entry::getKey)
+                        .collect(Collectors.toList());
+
+                log.info(leastBusyTechnicians.toString());
+
+                if (!leastBusyTechnicians.isEmpty()) {
+                    Random random = new Random();
+                    return leastBusyTechnicians.get(random.nextInt(leastBusyTechnicians.size()));
+                }
+            }
+        }
+
+        else {
+            log.info("First Team member is:: "+allTeamMembers.stream().findAny().get().getStaffName());
+            return allTeamMembers.get(0).getStaffName();
         }
 
         return null;

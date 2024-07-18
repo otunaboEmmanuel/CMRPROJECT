@@ -20,6 +20,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.transaction.Transactional;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -251,6 +252,19 @@ public class ReportController {
             }
         } else {
             return new ResponseEntity<>(new Responses("90", "Report ID is required", null), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/deleteReport")
+    @Transactional
+    public ResponseEntity<?> deleteReports(@RequestBody Map<String, String> data) {
+        log.info("Incoming request is::: "+data.toString());
+        Reports reports = reportRepository.findByReportId(Long.valueOf(data.get("reportId"))).orElse(null);
+        if(reports == null) {
+            return new ResponseEntity<>(new Responses("90", "Invalid Report ID", null), HttpStatus.OK);
+        }else {
+            reportRepository.deleteByReportId(reports.getReportId());
+            return new ResponseEntity<>(new Responses("00", "Report deleted successfully", null), HttpStatus.OK);
         }
     }
 }

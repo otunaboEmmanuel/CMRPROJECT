@@ -31,4 +31,6 @@ public interface RequestRepository extends JpaRepository<RequestEntity,Integer> 
     List<RequestEntity> findByStatusAndUnitAndTechnician(Status status, String departmentName, String technician);
 
     List<RequestEntity> findByRequesterUnitAndStatus(String departmentName, Status status);
+
+    List<RequestEntity> findByUnitAndCreatedTimeBetween(String unitName, LocalDateTime localDateTime, LocalDateTime localDateTime1);
 }

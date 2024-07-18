@@ -13,4 +13,6 @@ public interface ReportRepository extends JpaRepository<Reports, Long> {
     List<Reports> findByCreatedBy(String createdBy);
 
     Optional<Reports> findByReportId(Long reportId);
+
+    void deleteByReportId(Long reportId);
 }

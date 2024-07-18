@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface UsersRepository extends JpaRepository<Users,Long> {
     Optional<Users> findByStaffName (String staffName);
 
-    List<Users> findAllByUnitName(String unit);
+    List<Users> findAllByUnitName(Department unit);
 
     List<Users> findByUnitName(Department unit);
 
