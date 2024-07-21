@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -28,16 +29,23 @@ public class UserserviceImp implements UsersService {
     @Autowired
     private DepartmentRepository departmentRepository;
     @Override
-    public Users addNewUser(Map<String,String> data) {
-        Users users1=usersRepository.findByStaffName(data.get("technician")).orElse(null);
-        Department department1=departmentRepository.findByDepartmentName(data.get("unit").split("~~")[0]).orElse(null);
+    public Users addNewUser(Map<String,Object> data) {
+        Users users1=usersRepository.findByStaffName(String.valueOf(data.get("technician"))).orElse(null);
+        Department department1=departmentRepository.findByDepartmentName(String.valueOf(data.get("unit")).split("~~")[0]).orElse(null);
 
         if(department1 != null && users1 == null) {
             Users users = new Users();
-            users.setStaffName(data.get("technician"));
+            users.setStaffName(String.valueOf(data.get("technician")));
             users.setUnitName(department1);
-            users.setUserEmail(data.get("email"));
-            users.setRoles(Roles.fromCode(data.get("role")));
+            users.setUserEmail(String.valueOf(data.get("email")));
+            List<String> roles = (List<String>)data.get("role");
+            List<String> reviewedRoles = new ArrayList<>();
+            log.info(roles.toString());
+
+            for(String role : roles) {
+                reviewedRoles.add(String.valueOf(Roles.fromCode(role)));
+            }
+            users.setRoles(reviewedRoles);
             users.setAvailability(Availability.ONLINE);
             return usersRepository.save(users);
         }

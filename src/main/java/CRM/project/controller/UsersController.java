@@ -25,7 +25,7 @@ public class UsersController {
     private UsersService usersService;
 
     @PostMapping("/addUser")
-    public ResponseEntity<?> addUser(@RequestBody Map<String, String> data)
+    public ResponseEntity<?> addUser(@RequestBody Map<String, Object> data)
     {
         Users user1=usersService.addNewUser(data);
         return (user1!=null) ? new ResponseEntity<>(new Responses("00", "User details Saved Successfully", null), HttpStatus.OK)

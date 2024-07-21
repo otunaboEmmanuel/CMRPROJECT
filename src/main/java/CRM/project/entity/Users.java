@@ -6,7 +6,10 @@ import CRM.project.dto.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Cascade;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.util.List;
 
 @Entity
 @Data
@@ -25,8 +28,10 @@ public class Users extends TimeClass {
     private String staffName;
     private String userEmail;
 
-    @Enumerated(EnumType.STRING)
-    private Roles roles;
+    @ElementCollection
+    @Column(name = "roles")
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    private List<String> roles;
 
     @Enumerated(EnumType.STRING)
     private Availability availability;

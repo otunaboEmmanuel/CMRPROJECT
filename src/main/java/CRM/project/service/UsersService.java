@@ -9,7 +9,7 @@ import java.util.Map;
 
 public interface UsersService {
 
-    Users addNewUser(Map<String,String> data);
+    Users addNewUser(Map<String,Object> data);
 
     Users fetchStaffByName(String staffName);
 
